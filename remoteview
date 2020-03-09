@@ -1,0 +1,48 @@
+#!/bin/bash
+
+RESULT=$(ps aux |grep qemu-system-x86_64 |grep guest)
+OPTIONS=()
+
+IFS=','
+for i in $RESULT
+do
+	LINE=$(echo $i |xargs)
+	if [[ $LINE == *"guest="* ]]
+	then
+		IFS=' '
+		for n in $LINE
+		do
+			if [[ $n == *"guest="* ]]
+			then
+				GUEST=$(echo $n |cut -d'=' -f2)
+			fi
+		done
+		IFS=','
+	fi
+	if [[ $LINE == *"-spice"* ]]
+	then
+		ADDR=$(echo $LINE |cut -d'=' -f3)
+	fi
+	if [[ ! -z $GUEST && ! -z $ADDR ]]
+	then
+		OPTION=$(echo $GUEST $ADDR)
+		OPTIONS+=($OPTION)
+		unset GUEST
+		unset ADDR
+	fi
+done
+
+if [[ ${#OPTIONS[@]} == 1 ]]
+then
+	PORT=$(echo ${OPTIONS[0]}|cut -d' ' -f2)
+	remote-viewer spice://localhost:$PORT &
+	exit
+fi
+
+select opt in ${OPTIONS[@]}
+do
+	PORT=$(echo $opt|cut -d' ' -f2)
+	remote-viewer spice://localhost:$PORT &
+	break
+done
+
