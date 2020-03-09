@@ -1,0 +1,9 @@
+#!/bin/bash
+
+INPUT=$1
+OUTPUT=$2
+
+ffmpeg -y -i $INPUT -vf palettegen palette.png
+ffmpeg -y -i $INPUT -i palette.png -filter_complex paletteuse -r 10 $OUTPUT
+
+rm palette.png
