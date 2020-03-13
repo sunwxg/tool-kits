@@ -35,14 +35,14 @@ done
 if [[ ${#OPTIONS[@]} == 1 ]]
 then
 	PORT=$(echo ${OPTIONS[0]}|cut -d' ' -f2)
-	remote-viewer spice://localhost:$PORT &
+	remote-viewer spice://localhost:$PORT 1>/dev/null 2>/dev/null &
 	exit
 fi
 
 select opt in ${OPTIONS[@]}
 do
 	PORT=$(echo $opt|cut -d' ' -f2)
-	remote-viewer spice://localhost:$PORT & 1>/dev/null 2>/dev/null
+	remote-viewer spice://localhost:$PORT 1>/dev/null 2>/dev/null &
 	break
 done
 
